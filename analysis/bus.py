@@ -1,4 +1,5 @@
 import dateutil.parser
+from   datetime import datetime
 class bus:
 	def __init__(self, busId):
 		#Min and max are the oldest and newest timestamps in the history
@@ -22,10 +23,24 @@ class bus:
 		if((not self.max) or ts>self.max):
 			self.max = ts
 
-	#this grabs datapoints between two TSs
-	def getHistory(self, tsMin, tsMax):
-		tsMin = self._str2dt(tsMin)
-		tsMax = self._str2dt(tsMax)
+	#this grabs datapoints between two TSs, or all up to a point if only
+	#the first parameter is used
+	def getHistory(self, tsMin=None, tsMax=None):
+
+		#If both parameters are empty, just output entire history
+		if tsMin == none and tsMax == none:
+			return self.history
+
+		#here we narrow out whether both tsMin and TsMax are defined,
+		#or if only one.
+		if tsMin and tsMax:
+			tsMin = self._str2dt(tsMin)
+			tsMax = self._str2dt(tsMax)
+
+		elif tsMin and not tsMax:
+			tsMax = self._str2dt(tsMin)
+			tsMin = datetime(1970,1,1,0,0)
+
 		returnArr = []
 
 		#This situation is nonsense and we won't have any of it
@@ -54,7 +69,7 @@ class bus:
 			return returnArr
 
 	#this grabs the most recent datapoint as of a timestamp
-	def getHistory(self, ts):
+	def getNewestPoint(self, ts):
 		returnArr = []
 
 		#discounting queries outside the known bounds of the log
@@ -74,8 +89,3 @@ class bus:
 				break
 			
 			return self.history[target]
-
-	#this returns the entire history of a bus
-	def getHistory(self):
-		return self.history
-
