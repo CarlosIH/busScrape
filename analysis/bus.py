@@ -28,7 +28,7 @@ class bus:
 	def getHistory(self, tsMin=None, tsMax=None):
 
 		#If both parameters are empty, just output entire history
-		if tsMin == none and tsMax == none:
+		if tsMin == None and tsMax == None:
 			return self.history
 
 		#here we narrow out whether both tsMin and TsMax are defined,
