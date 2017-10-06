@@ -23,7 +23,7 @@ class bus:
 			self.max = ts
 
 	#this grabs datapoints between two TSs
-	def getLogPoints(self, tsMin, tsMax):
+	def getHistory(self, tsMin, tsMax):
 		tsMin = self._str2dt(tsMin)
 		tsMax = self._str2dt(tsMax)
 		returnArr = []
@@ -52,9 +52,9 @@ class bus:
 			return None
 		else:
 			return returnArr
-	
+
 	#this grabs the most recent datapoint as of a timestamp
-	def getLogPoint(self, ts):
+	def getHistory(self, ts):
 		returnArr = []
 
 		#discounting queries outside the known bounds of the log
@@ -74,4 +74,8 @@ class bus:
 				break
 			
 			return self.history[target]
+
+	#this returns the entire history of a bus
+	def getHistory(self):
+		return self.history
 
