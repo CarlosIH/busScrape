@@ -12,11 +12,11 @@ apiKey = "api key here"
 cur = con.cursor()
 
 cur.execute("CREATE TABLE IF NOT EXISTS busList (id INTEGER PRIMARY KEY, "+
-	"BusId INTEGER, busLine VARCHAR(10), RecordedAtTime TEXT, "+
-	"latitude NUMERIC, longitude NUMERIC);")
+    "BusId INTEGER, busLine VARCHAR(10), RecordedAtTime TEXT, "+
+    "latitude NUMERIC, longitude NUMERIC);")
 
 busListAddr = ("http://api.511.org/transit/vehiclemonitoring?agency=actransit"
-	"&api_key="+apiKey)
+    "&api_key="+apiKey)
 
 #This dict stores the most recent TS of a bus
 busAge = {}
@@ -25,21 +25,21 @@ busAge = {}
 cur.execute("SELECT BusID, RecordedAtTime FROM busList GROUP BY busId ORDER BY RecordedAtTime ASC;")
 check = cur.fetchall()
 for bus in check:
-	busAge[bus[0]] = bus[1]
+    busAge[bus[0]] = bus[1]
 
 while True:
-	busListRaw = urllib.request.urlopen(busListAddr).read().decode()[1:]
-	data = json.loads(busListRaw)
-	busList = data["Siri"]["ServiceDelivery"]["VehicleMonitoringDelivery"]["VehicleActivity"]
-	for bus in busList:
-		busInfo = bus["MonitoredVehicleJourney"]
+    busListRaw = urllib.request.urlopen(busListAddr).read().decode()[1:]
+    data = json.loads(busListRaw)
+    busList = data["Siri"]["ServiceDelivery"]["VehicleMonitoringDelivery"]["VehicleActivity"]
+    for bus in busList:
+        busInfo = bus["MonitoredVehicleJourney"]
 
-		if busInfo["VehicleRef"] not in busAge or busAge[busInfo["VehicleRef"]] is not bus["RecordedAtTime"]:
-			cur.execute("insert into busList(busId, busLine, RecordedAtTime, latitude, longitude) VALUES (?, ?, ?, ?, ?)",
-				(busInfo["VehicleRef"], busInfo["LineRef"],bus["RecordedAtTime"],busInfo["VehicleLocation"]["Latitude"],busInfo["VehicleLocation"]["Longitude"]))
-			busAge[busInfo["VehicleRef"]] = bus["RecordedAtTime"]
-		else:
-			continue
+        if busInfo["VehicleRef"] not in busAge or busAge[busInfo["VehicleRef"]] is not bus["RecordedAtTime"]:
+            cur.execute("insert into busList(busId, busLine, RecordedAtTime, latitude, longitude) VALUES (?, ?, ?, ?, ?)",
+                (busInfo["VehicleRef"], busInfo["LineRef"],bus["RecordedAtTime"],busInfo["VehicleLocation"]["Latitude"],busInfo["VehicleLocation"]["Longitude"]))
+            busAge[busInfo["VehicleRef"]] = bus["RecordedAtTime"]
+        else:
+            continue
 
-	con.commit()
-	time.sleep(60)
+    con.commit()
+    time.sleep(60)
