@@ -2,18 +2,25 @@ import dateutil.parser
 from   datetime import datetime
 class bus:
     def __init__(self, busId):
+        """Initializes a bus with a BusID"""
         #Min and max are the oldest and newest timestamps in the history
         self.busId   = busId
         self.history = []
         self.min     = None
         self.max     = None
 
-    #This method parses the timestamp into datetime object
     def _str2dt(self, str):
+        """This method parses the timestamp into datetime object"""
         return dateutil.parser.parse(str)
 
     def logPoint(self, tsString, loc, busLine):
-        #location is a lat/lon array
+        """Adds a point to self.history
+
+        tsString is a timestamp string from 511's XML file
+        loc is a lat/lon tuple
+        busLine is the busLine that the bus was operating as at that moment
+        """
+
         ts = dateutil.parser.parse(tsString)
         self.history.append({"ts":ts, "loc":loc, "busLine":busLine})
 
@@ -23,9 +30,18 @@ class bus:
         if((not self.max) or ts>self.max):
             self.max = ts
 
-    #this grabs datapoints between two TSs, or all up to a point if only
-    #the first parameter is used
     def getHistory(self, tsMin=None, tsMax=None):
+        """Gets datapoints between two dates, all up to a date, or everything
+
+        If two dates are specified, the program will output all datapoints
+        between and including the two dates
+
+        If only one date is specified, then the program will run as though
+        the beginning date was unix epoch, and the end date the specified
+        date and pull all datapoints between and including those dates
+
+        If no parameter is specified it simply returns all history
+        """
 
         #If both parameters are empty, just output entire history
         if tsMin == None and tsMax == None:
@@ -68,8 +84,8 @@ class bus:
         else:
             return returnArr
 
-    #this grabs the most recent datapoint as of a timestamp
     def getNewestPoint(self, ts):
+        """This function grabs the most recent datapoint as of a timestamp"""
         returnArr = []
 
         #discounting queries outside the known bounds of the log
