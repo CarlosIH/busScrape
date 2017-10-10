@@ -22,21 +22,27 @@ busListAddr = ("http://api.511.org/transit/vehiclemonitoring?agency=actransit"
 busAge = {}
 
 #Initialize with the age of all busses currently in the database
-cur.execute("SELECT BusID, RecordedAtTime FROM busList GROUP BY busId ORDER BY RecordedAtTime ASC;")
+cur.execute("SELECT BusID, RecordedAtTime FROM busList GROUP BY BusID "
+    "ORDER BY RecordedAtTime ASC;")
 check = cur.fetchall()
 for bus in check:
     busAge[bus[0]] = bus[1]
 
 while True:
     busListRaw = urllib.request.urlopen(busListAddr).read().decode()[1:]
-    data = json.loads(busListRaw)
-    busList = data["Siri"]["ServiceDelivery"]["VehicleMonitoringDelivery"]["VehicleActivity"]
+    data = json.loads(busListRaw)["Siri"]["ServiceDelivery"]
+    busList = data["VehicleMonitoringDelivery"]["VehicleActivity"]
     for bus in busList:
         busInfo = bus["MonitoredVehicleJourney"]
 
-        if busInfo["VehicleRef"] not in busAge or busAge[busInfo["VehicleRef"]] is not bus["RecordedAtTime"]:
-            cur.execute("insert into busList(busId, busLine, RecordedAtTime, latitude, longitude) VALUES (?, ?, ?, ?, ?)",
-                (busInfo["VehicleRef"], busInfo["LineRef"],bus["RecordedAtTime"],busInfo["VehicleLocation"]["Latitude"],busInfo["VehicleLocation"]["Longitude"]))
+        if busInfo["VehicleRef"] not in busAge or \
+            busAge[busInfo["VehicleRef"]] is not bus["RecordedAtTime"]:
+
+            cur.execute("insert into busList(busId, busLine,"
+                "RecordedAtTime, latitude, longitude) VALUES (?, ?, ?, ?, ?)",
+                (busInfo["VehicleRef"], busInfo["LineRef"],
+                bus["RecordedAtTime"],busInfo["VehicleLocation"]["Latitude"],
+                busInfo["VehicleLocation"]["Longitude"]))
             busAge[busInfo["VehicleRef"]] = bus["RecordedAtTime"]
         else:
             continue
