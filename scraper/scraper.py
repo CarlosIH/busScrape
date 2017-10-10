@@ -11,8 +11,8 @@ apiKey = "api key here"
 
 cur = con.cursor()
 
-cur.execute("CREATE TABLE IF NOT EXISTS busList (id INTEGER PRIMARY KEY, "+
-    "BusId INTEGER, busLine VARCHAR(10), RecordedAtTime TEXT, "+
+cur.execute("CREATE TABLE IF NOT EXISTS busList (id INTEGER PRIMARY KEY, "
+    "BusId INTEGER, busLine VARCHAR(10), RecordedAtTime TEXT, "
     "latitude NUMERIC, longitude NUMERIC);")
 
 busListAddr = ("http://api.511.org/transit/vehiclemonitoring?agency=actransit"
